@@ -1,10 +1,11 @@
 import itertools
 import pickle
+import time
 from fuzzywuzzy import fuzz
 
 
 
-div = '======================================'
+div = '======================================================================='
 
 
 intro = [
@@ -16,6 +17,8 @@ intro = [
     '"--exit" to exit the program...',
     ''
 ]
+version = '1.0.0'
+new_content_reminders = 'Reminders:\n--save to save your content.\n--exit to exit.\nContent take only 100 lines\n'
 
 data = {}
 
@@ -36,7 +39,7 @@ def save(category, title, content):
     with open('data.pickle', 'wb') as pkl:
         pickle.dump(data, pkl)
 
-    return '{} for {} category has been saved'.format(title, category)
+    return '"{}" for "{}" category has been saved'.format(title, category)
 
 
 def get_line_text_content():
@@ -66,10 +69,10 @@ def get_line_text_content():
                         yield '--back {}'.format(back_to)
                     else:
                         current_line -= 1
-                        print("Error! line number {} doesn't exist".format(back_to))
+                        print('Error! line number "{}" do not exist'.format(back_to))
                         yield 'pass'
                 except:
-                    print('Error! {} invalid input for a number')
+                    print('Error! "{}" is invalid input for a number'.format(back_to))
                     current_line -= 1
                     yield 'pass'
             else:
@@ -88,7 +91,7 @@ def search(command):
 
     if len(result) > 0:
 
-        print('Result for {}\n'.format(text))
+        print('Result for "{}"...\n'.format(text))
         for i, r in enumerate(result):
             print('{}. {}'.format(i + 1, r[0]))
         print('\n')
@@ -104,13 +107,13 @@ def search(command):
                 if index > 0 and index <= len(result):
                     done = True
                     # returning the content with title and dividing line
-                    return '{}\n{}\n\n{}\n{}'.format(div, result[index - 1][0], result[index - 1][1], div)
+                    return '{}\nTitle: {}\n\n{}\n{}'.format(div, result[index - 1][0], result[index - 1][1], div)
                 else:
-                    print("{} is not in the choices".format(pick))
+                    print('"{}" is not in the choices...'.format(pick))
             except:
-                print("{} is not a number".format(pick))
+                print('"{}" is not a number...'.format(pick))
     else:
-        return 'No {} in the data...'.format(text)
+        return 'No "{}" in the data...'.format(text)
 
 def add(text):
 
@@ -122,7 +125,7 @@ def add(text):
     except:
         return 'Error! You must include a category separated by space...'
 
-    print('Type --save to save your content\n')
+    print(new_content_reminders)
 
     title = ''
     has_title = False
@@ -163,7 +166,7 @@ def add(text):
             elif warning == 'n':
                 add(text)
             else:
-                return 'add aborted!'
+                return 'add aborted!...'
         else:
             text = ''.join(content)
             print('\n{}\n'.format(div))
@@ -176,7 +179,7 @@ def add(text):
                     return save(category, title, ' '.join(content))
                 elif question_to_save == 'n':
                     answered = True
-                    return 'Add aborted!'
+                    return 'Add aborted!...'
 
 def get_list(text):
     category = ' '.join(text.split(' ')[1:])
@@ -197,24 +200,24 @@ def get_list(text):
                 index = int(pick)
                 if index > 0 and index <= len(list_of_titles):
                     done = True
-                    return "{}\n\n{}\n{}".format(div, data[category][list_of_titles[index - 1]], div)
+                    return "{}\nTitle: {}\n\n{}\n{}".format(div, list_of_titles[index - 1], data[category][list_of_titles[index - 1]], div)
                 else:
                     print('[Error] index is not in a list of titles...')
             except:
                 if pick == '--exit':
                     return '{}\n'.format(div)
                 else:
-                    print('[Error] {} is not a number'.format(pick))
+                    print('[Error] "{}" is not a number'.format(pick))
     else:
-        return 'No content for this category'
+        return 'No content for this category...'
 
 
 def get_directories():
-    dir = ''
+    dir = []
     for key in data:
-        dir += '{}\n'.format(key)
-
-    return dir
+        dir.append(key)
+    print("Total Categories: {}".format(len(dir)))
+    return '{}\n\nType --list category to list out all the content'.format('\n'.join(dir))
 
 
 def delete_content(text):
@@ -230,17 +233,17 @@ def delete_content(text):
                 print('{}\n{}\n{}'.format(div, data[category][title], div))
                 done = False
                 while not done:
-                    confirm = input('Are you sure you want to delete {}? y/n: '.format(title))
+                    confirm = input('Are you sure you want to delete "{}"? y/n: '.format(title))
                     if confirm == 'y':
                         del data[category][title]
                         with open('data.pickle', 'wb') as pkl:
                             pickle.dump(data, pkl)
                         done = True
-                        return '{} has been deleted...'.format(title)
+                        return '"{}" has been deleted...'.format(title)
                     elif confirm == 'n':
                         done = True
-                        return 'Deleting {} is aborted...'.format(title)
-    return 'No content for {}'.format(title)
+                        return 'Deleting "{}" is aborted...'.format(title)
+    return 'No content for "{}"'.format(title)
 
 
 def get_user_command():
@@ -268,7 +271,7 @@ def get_user_command():
                     print(itr)
             print()
 
-            yield "{} command doesn't exist...".format(command)
+            yield '"{}" command error...'.format(command)
 
 
 def main():
@@ -278,10 +281,13 @@ def main():
     for response in get_user_command():
         print(response)
         if response == 'bye':
+            time.sleep(1)
             break
 
 
 if __name__ == '__main__':
     load_data()
-    print('\n===============  Welcome to CMD Note  ===============\n\n')
+    print('\n===============  Welcome to CMD Note version: {}  ===============\n\n'.format(version))
+    input('Press enter to start...')
+    print('\n\n')
     main()
