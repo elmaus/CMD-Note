@@ -1,7 +1,7 @@
 import itertools
 import pickle
 from fuzzywuzzy import fuzz
-from fuzzywuzzy import process
+
 
 
 div = '======================================'
