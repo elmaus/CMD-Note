@@ -1,7 +1,7 @@
-
 import itertools
 import pickle
 from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
 
 
 div = '======================================'
@@ -41,6 +41,8 @@ def save(category, title, content):
 
 def get_line_text_content():
     current_line = 1
+
+    # python generator to generate sequence of input function for the user
     for l in itertools.count():
         if l < 99:
             ind = current_line if current_line > 9 else '0{}'.format(current_line)
@@ -48,6 +50,13 @@ def get_line_text_content():
             inp = input('[{}]: '.format(ind))
 
             if '--back' in inp:
+
+                """
+                    --back is a command that allows to overwrite previous lines with the corresponding number
+                    ex:
+                    --back 2 # all you have written in line greater than 2 will be overwritten
+                """
+
                 back_to = inp.split(' ')[-1]
                 try:
                     if int(back_to) < current_line and current_line > 1:
@@ -85,11 +94,13 @@ def search(command):
         done = False
 
         while not done:
+            # asking the user to enter the number corresponding with the title wanted to be open
             pick = input('Enter the key number: ')
             try:
                 index = int(pick)
                 if index > 0 and index <= len(result):
                     done = True
+                    # returning the content with title and dividing line
                     return '{}\n{}\n\n{}\n{}'.format(div, result[index - 1][0], result[index - 1][1], div)
                 else:
                     print("{} is not in the choices".format(pick))
@@ -106,8 +117,9 @@ def add(text):
         if category == '':
             return 'Error! You must include a category seperated by space...'
     except:
-        return 'Error! You must include a category seperated by space...'
+        return 'Error! You must include a category separated by space...'
 
+    title = ''
     has_title = False
     while not has_title:
         title = input('TITLE: ')
@@ -115,6 +127,7 @@ def add(text):
             print('Error! TITLE needs an input...')
         else:
             has_title = True
+
 
     print('CONTENT:')
 
@@ -193,6 +206,33 @@ def get_directories():
 
     return dir
 
+
+def delete_content(text):
+    global data
+    title = ' '.join(text.split(' ')[1:])
+    if title == "":
+        print("Can't delete empty title")
+        return 'type --del title'
+
+    for category in data:
+        for t in data[category]:
+            if t == title:
+                print('{}\n{}\n{}'.format(div, data[category][title], div))
+                done = False
+                while not done:
+                    confirm = input('Are you sure you want to delete {}? y/n: '.format(title))
+                    if confirm == 'y':
+                        del data[category][title]
+                        with open('data.pickle', 'wb') as pkl:
+                            pickle.dump(data, pkl)
+                        done = True
+                        return '{} has been deleted'.format(title)
+                    elif confirm == 'n':
+                        done = True
+                        return 'Deleting {} is aborted'.format(title)
+    return 'No content for {}'.format(title)
+
+
 def get_user_command():
     for i in itertools.count():
         text = input('>>> ')
@@ -206,6 +246,8 @@ def get_user_command():
             yield get_directories()
         elif command == '--list':
             yield get_list(text)
+        elif command == '--del':
+            yield delete_content(text)
         elif command == '--exit':
             print('bye!')
             return
