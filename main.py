@@ -9,10 +9,10 @@ div = '======================================'
 
 intro = [
     ''
-    '"--search" space "query title" to search code...',
-    '"--list space "category" to list all code from a category...',
+    '"--dir" to list out all categories',
+    '"--list space "category" to list out all notes from the category...',
     '"--add" space "category" to add new code directory...',
-    '"--setting to set the app'
+    '"--search" space "query title" to search code...',
     '"--exit" to exit the program...',
     ''
 ]
@@ -49,7 +49,9 @@ def get_line_text_content():
             current_line += 1
             inp = input('[{}]: '.format(ind))
 
-            if '--back' in inp:
+            if '--exit' in inp:
+                yield '--exit'
+            elif '--back' in inp:
 
                 """
                     --back is a command that allows to overwrite previous lines with the corresponding number
@@ -96,6 +98,7 @@ def search(command):
         while not done:
             # asking the user to enter the number corresponding with the title wanted to be open
             pick = input('Enter the key number: ')
+
             try:
                 index = int(pick)
                 if index > 0 and index <= len(result):
@@ -127,6 +130,8 @@ def add(text):
         title = input('TITLE: ')
         if title == '':
             print('Error! TITLE needs an input...')
+        elif title == '--exit':
+            return "{}\n".format(div)
         else:
             has_title = True
 
@@ -134,7 +139,9 @@ def add(text):
     print('CONTENT:')
 
     for i in get_line_text_content():
-        if i != '--save' and i != 'pass':
+        if i == '--exit':
+            return '\n{}\n'.format(div)
+        elif i != '--save' and i != 'pass':
             content.append('{}\n'.format(i))
 
             if i.split(' ')[0] == '--back': # going back to previous
@@ -157,11 +164,9 @@ def add(text):
                 add(text)
             else:
                 return 'add aborted!'
-        elif i == '--exit':
-            return 'aborted!'
         else:
             text = ''.join(content)
-            print('\n==========================================\n')
+            print('\n{}\n'.format(div))
             print(text + '\n')
             answered = False
             while not answered:
@@ -189,14 +194,17 @@ def get_list(text):
         while not done:
             pick = input('[Enter the index] What content do you want to open?: ')
             try:
-                index = int(pick) - 1
-                if index > 0 and index < len(list_of_titles):
+                index = int(pick)
+                if index > 0 and index <= len(list_of_titles):
                     done = True
-                    return "{}\n\n{}\n{}".format(div, data[category][list_of_titles[index]], div)
+                    return "{}\n\n{}\n{}".format(div, data[category][list_of_titles[index - 1]], div)
                 else:
                     print('[Error] index is not in a list of titles...')
             except:
-                print('[Error] {} is not a number'.format(pick))
+                if pick == '--exit':
+                    return '{}\n'.format(div)
+                else:
+                    print('[Error] {} is not a number'.format(pick))
     else:
         return 'No content for this category'
 
