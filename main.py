@@ -213,7 +213,7 @@ def delete_content(text):
     global data
     title = ' '.join(text.split(' ')[1:])
     if title == "":
-        print("Can't delete empty title")
+        print("Can't delete empty title...")
         return 'type --del title'
 
     for category in data:
@@ -228,10 +228,10 @@ def delete_content(text):
                         with open('data.pickle', 'wb') as pkl:
                             pickle.dump(data, pkl)
                         done = True
-                        return '{} has been deleted'.format(title)
+                        return '{} has been deleted...'.format(title)
                     elif confirm == 'n':
                         done = True
-                        return 'Deleting {} is aborted'.format(title)
+                        return 'Deleting {} is aborted...'.format(title)
     return 'No content for {}'.format(title)
 
 
