@@ -115,9 +115,11 @@ def add(text):
     try:
         category = text.split(' ')[1]
         if category == '':
-            return 'Error! You must include a category seperated by space...'
+            return 'Error! You must include a category separated by space...'
     except:
         return 'Error! You must include a category separated by space...'
+
+    print('Type --save to save your content\n')
 
     title = ''
     has_title = False
