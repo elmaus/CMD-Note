@@ -87,13 +87,13 @@ def search(command):
     for category in data:
         for title in data[category]:
             if fuzz.token_set_ratio(text, title) > 50:
-                result.append((title, data[category][title]))
+                result.append((title, data[category][title], category))
 
     if len(result) > 0:
 
         print('Result for "{}"...\n'.format(text))
         for i, r in enumerate(result):
-            print('{}. {}'.format(i + 1, r[0]))
+            print('{}. {} ({})'.format(i + 1, r[0], r[2]))
         print('\n')
 
         done = False
