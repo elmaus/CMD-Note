@@ -2,6 +2,7 @@ import itertools
 import pickle
 import time
 from fuzzywuzzy import fuzz
+import math
 
 
 
@@ -10,10 +11,11 @@ div = '======================================================================='
 
 intro = [
     ''
-    '"--dir" to list out all categories',
+    '"--dir" to list out all categories...',
     '"--list space "category" to list out all notes from the category...',
     '"--add" space "category" to add new code directory...',
     '"--search" space "query title" to search code...',
+    '"--calc" for calculator mode...',
     '"--exit" to exit the program...',
     ''
 ]
@@ -26,6 +28,59 @@ def load_data():
     global data
     with open('data.pickle', 'rb') as pickle_file:
         data = pickle.load(pickle_file)
+
+def calculate(text):
+    error = "ERROR! Must be a string..."
+    commands = ['eval', 'sin', 'cos', 'tan', 'asin', 'acos', 'atan',
+    'factorial', 'degrees', 'radians']
+    print('For the list of commands, type commands...')
+
+    for i in itertools.count():
+
+        inp = input(">>> ")
+        part1 = inp.split(' ')[0]
+        part2 = " ".join(inp.split(' ')[1:])
+
+        
+        try:
+            if part1 == 'commands':
+                for com in commands:
+                    print(com)
+            elif part1 == 'eval':
+                yield eval(part2)
+            elif part1 == 'sin':
+                yield math.sin(int(part2))
+            elif part1 == 'cos':
+                yield math.cos(int(part2))
+            elif part1 == 'tan':
+                yield math.tan(int(part2))
+            elif part1 == 'asin':
+                yield math.asin(int(part2))
+            elif part1 == 'acos':
+                yield math.acos(int(part2))
+            elif part1 == 'atan':
+                yield math.atan(int(part2))
+            elif part1 == 'factorial':
+                yield math.factorial(int(part2))
+            elif part1 == 'radians':
+                yield math.randians(int(part2))
+            elif part1 == 'degrees':
+                yield math.degrees(int(part2))
+            elif part1 == '--exit':
+                return '--exit'
+            else:
+                yield 'ERROR!: There is no command for {}'.format(part1)
+
+        except Exception as e:
+                yield e
+
+        
+def calculator(text):
+    for i in calculate(text):
+        if i == '--exit':
+            return 'Calculator mode exited...'
+        else:
+            print(i)
 
 def save(category, title, content):
     global data
@@ -261,6 +316,8 @@ def get_user_command():
             yield get_list(text)
         elif command == '--del':
             yield delete_content(text)
+        elif command == '--calc':
+            yield calculator(text)
         elif command == '--exit':
             print('bye!')
             return
